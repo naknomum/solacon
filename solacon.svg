@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" >
+  <script onLoad="alert('ok')" type="text/javascript"><![CDATA[
+
+	var debug = false;
+	var container = window.frameElement;
+	var value = container && container.dataset.value;
+	var svgEl = document.getElementsByTagName('svg')[0];
+	var ctr = [250, 250];
+
+	// give us functions on the containing dom element
+	container.create = function(v) { create(v); }
+
+	function init(ev) {
+		console.log('init called: %o', ev);
+		create(value);
+		generate();
+	}
+
+	function generate() {
+		let slices = Math.floor(3 + Math.random() * 7);
+		let wAngle = Math.PI * 2 / slices;
+		let data = [
+			[Math.random(), Math.random(), Math.random()],
+			[Math.random(), Math.random(), Math.random()],
+			[Math.random(), Math.random(), Math.random()]
+		];
+		for (let i = 0 ; i < slices ; i++) {
+			wedge(wAngle * i, wAngle * (i + 1), 250, data);
+		}
+
+	}
+
+	// data = [r1, r2, alpha] where all values are 0.0-1.0
+	function wedge(a1, a2, size, data) {
+		for (let i = 0 ; i < data.length ; i++) {
+			swish(a1, a2, size * data[i][0], size * data[i][1], data[i][2]);
+		}
+		let endPt = pt(a1, size);
+		if (debug) addSvgLine([0,0], endPt, ctr, 'gray');
+		endPt = pt(a2, size);
+		if (debug) addSvgLine([0,0], endPt, ctr, 'gray');
+	}
+
+	function swish(a1, a2, r1, r2, alpha) {
+		let p1 = pt(a1, r1);
+		let p2 = pt(a2, r2);
+		if (debug) {
+			addSvgPt(p1, ctr, 'red');
+			addSvgPt(p2, ctr, 'blue');
+		}
+		let paths = [];
+		paths.push(bez(a1, a2, r1, r2, ctr));
+		addSvgEl(alpha, paths);
+	}
+
+	function create(value) {
+		console.info('value = %o', value);
+		if (!value) return;
+	}
+
+	// this requires/assumes a2 > a1
+	function bez(a1, a2, r1, r2, offset) {
+		let aNudge = 0.3;
+		let rNudge = 0.03;
+		let p1 = pt(a1, r1);
+		let p2 = pt(a2, r2);
+		let bd = (a2 - a1) / 3;
+		let b1 = pt(a1 + bd, (r1 + r2) / 2);
+		let b2 = pt(a2 - bd, (r1 + r2) / 2);
+		if (debug) {
+			addSvgPt(b1, ctr, 'brown');
+			addSvgPt(b2, ctr, 'orange');
+		}
+		let path = ptStr(p1, offset, 'M') + ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p2, offset);
+		b1 = pt(a1 + bd, (r1 + r2) / 3);
+		b2 = pt(a2 - bd, (r1 + r2) / 3);
+		path += ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p1, offset);
+		return path;
+	}
+	function pt(theta, r) {
+		let x = r * Math.cos(theta);
+		let y = r * Math.sin(theta);
+		return [x,y];
+	}
+	function ptStr(pt, offset, cmd) {
+		if (!offset) offset = [0,0];
+		let x = Math.round((pt[0] + offset[0]) * 100) / 100;
+		let y = Math.round((pt[1] + offset[1]) * 100) / 100;
+		return (cmd ? cmd + ' ' : '') + x + ' ' + y;
+	}
+
+	
+	function addSvgEl(alpha, paths) {
+        	let el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        	el.setAttribute('fill', 'rgba(0.5, 0.5, 0.5, ' + alpha + ')');
+        	el.setAttribute("d", paths.join(' '));
+		svgEl.appendChild(el);
+	}
+	function addSvgPt(pt, offset, color) {
+        	let el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        	el.setAttribute('fill', color);
+        	el.setAttribute('r', 3);
+        	el.setAttribute('cx', pt[0] + offset[0]);
+        	el.setAttribute('cy', pt[1] + offset[1]);
+		svgEl.appendChild(el);
+	}
+	function addSvgLine(p1, p2, offset, color) {
+        	let el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        	el.setAttribute('stroke', color);
+        	el.setAttribute('stroke-width', 2);
+        	el.setAttribute('x1', p1[0] + offset[0]);
+        	el.setAttribute('y1', p1[1] + offset[1]);
+        	el.setAttribute('x2', p2[0] + offset[0]);
+        	el.setAttribute('y2', p2[1] + offset[1]);
+		svgEl.appendChild(el);
+	}
+
+
+	function sdbm(s) {
+        	var h = 0;
+        	for (var i = 0 ; i < s.length ; i++) {
+            		h = s.charCodeAt(i) + (h << 6) + (h << 16) - h;
+        	}
+        	return (h >>> 0);
+	}
+
+	window.addEventListener('load', function(ev) { init(ev); });
+
+  ]]></script>
+</svg>
