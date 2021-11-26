@@ -5,7 +5,7 @@ This is also known as a "visual hash".
 
 The solacon is **seeded with a value** (string) which determines the shape, symmetry, and shades of the image.
 
-The SVG file contains all the javascript to generate the content, so one only needs to set attributes on the object
+The SVG file contains all the javascript to generate the content, so one only needs to set attributes (e.g. `data-value`) on the object
 that is embedding the svg.
 
 ![Solacon.svg](Solacon.svg.png "Solacon.svg")
