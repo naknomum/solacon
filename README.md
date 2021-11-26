@@ -1,4 +1,4 @@
-# Solacon
+# solacon
 
 A *solacon* is a varition of an [identicon](https://en.wikipedia.org/wiki/Identicon), in the form of a solar/spiral/floral shape.
 This is also known as a "visual hash".
@@ -7,6 +7,13 @@ The solacon is **seeded with a value** (string) which determines the shape, symm
 
 The SVG file contains all the javascript to generate the content, so one only needs to set attributes on the object
 that is embedding the svg.
+
+![Solacon.svg](Solacon.svg.png "Solacon.svg")
+
+## Example
+
+Try out some [dynamical examples](https://naknomum.github.io/solacon-example/) of **solacons** in action.
+
 
 ## Usage
 
@@ -28,7 +35,7 @@ svgObj.generate();  // random seed value
 
 ## Similar projects
 
-My similar identicon project, [Hexicon](https://github.com/naknomum/hexicon).
+Another identicon project of mine, [Hexicon.js](https://github.com/naknomum/hexicon).
 
 For related work, check out [Awesome Identicons](https://github.com/drhus/awesome-identicons), a curated list of _visual hashes_ maintained by **Husam ABBOUD**.
 
