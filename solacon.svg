@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="solacon-svg">
   <script type="text/javascript"><![CDATA[
 
-	var debug = false;
 	var container;
 	var svgEl;
 	var center, width, height;
@@ -46,7 +45,6 @@
 				(hash >>> (i * 3 + 1) & 0x07) / 7,
 				hash >>> (i * 3 + 2) & 0x07
 			]);
-			if (debug) console.debug('%d => %o', i, data[data.length-1]);
 		}
 		for (let i = 0 ; i < slices ; i++) {
 			wedge(wAngle * i, wAngle * (i + 1), Math.min(width, height) / 2, data);
@@ -69,18 +67,12 @@
 			swish(a1, a2, size * data[i][0], size * data[i][1], data[i][2]);
 		}
 		let endPt = pt(a1, size);
-		if (debug) addSvgLine([0,0], endPt, center, 'gray');
 		endPt = pt(a2, size);
-		if (debug) addSvgLine([0,0], endPt, center, 'gray');
 	}
 
 	function swish(a1, a2, r1, r2, alpha) {
 		let p1 = pt(a1, r1);
 		let p2 = pt(a2, r2);
-		if (debug) {
-			addSvgPt(p1, center, 'red');
-			addSvgPt(p2, center, 'blue');
-		}
 		let paths = [];
 		paths.push(bez(a1, a2, r1, r2, center));
 		addSvgEl(alpha, paths);
@@ -100,10 +92,6 @@
 		let bd = (a2 - a1) / 3;
 		let b1 = pt(a1 + bd, (r1 + r2) / 2);
 		let b2 = pt(a2 - bd, (r1 + r2) / 2);
-		if (debug) {
-			addSvgPt(b1, center, 'brown');
-			addSvgPt(b2, center, 'orange');
-		}
 		let path = ptStr(p1, offset, 'M') + ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p2, offset);
 		b1 = pt(a1 + bd, (r1 + r2) / 3);
 		b2 = pt(a2 - bd, (r1 + r2) / 3);
@@ -135,27 +123,6 @@
         	el.setAttribute('class', 'solacon-shade-' + alpha);
 		svgEl.appendChild(el);
 	}
-
-	// Pt and Line are really only for debugging
-	function addSvgPt(pt, offset, color) {
-        	let el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        	el.setAttribute('fill', color);
-        	el.setAttribute('r', 3);
-        	el.setAttribute('cx', pt[0] + offset[0]);
-        	el.setAttribute('cy', pt[1] + offset[1]);
-		svgEl.appendChild(el);
-	}
-	function addSvgLine(p1, p2, offset, color) {
-        	let el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        	el.setAttribute('stroke', color);
-        	el.setAttribute('stroke-width', 2);
-        	el.setAttribute('x1', p1[0] + offset[0]);
-        	el.setAttribute('y1', p1[1] + offset[1]);
-        	el.setAttribute('x2', p2[0] + offset[0]);
-        	el.setAttribute('y2', p2[1] + offset[1]);
-		svgEl.appendChild(el);
-	}
-
 
 	function sdbm(s) {
 		if (s.length < 6) s = s + s + s + s + s;  //short strings kinda suck
