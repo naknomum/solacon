@@ -29,8 +29,10 @@ Try out some [dynamical examples](https://naknomum.github.io/solacon-example/) o
 var svgObj = document.getElementById('svg-obj');
 svgObj.setRGB('100, 150, 200');
 svgObj.generate('some new value');
-svgObj.setRGB();    // random color
-svgObj.generate();  // random seed value
+svgObj.setRGB();         // random color
+svgObj.generate();       // random seed value
+svgObj.setRGBFromHash(); // color is based off hashValue (default behavior when color not specified)
+svgObj.refresh();        // applies color change to current shape
 ```
 
 ## Similar projects

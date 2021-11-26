@@ -4,8 +4,9 @@
 	var container;
 	var svgEl;
 	var center, width, height;
-	var rgb = '50, 50, 50';
+	var rgb;
 	var value;
+	var hashValue;
 
 	function init(ev) {
 		container = window.frameElement;
@@ -20,7 +21,10 @@
 			clear();
 			generate(v);
 		}
-		container.setRGB = function(newRGB) { setRGB(newRGB); }
+		container.setRGB = function(newRGB) { return setRGB(newRGB); }
+		container.setRGBFromHash = function() { return setRGBFromHash(); }
+		container.getHashValue = function() { return hashValue; }
+		container.refresh = function() { return refresh(); }
 		generate(value);
 	}
 
@@ -31,7 +35,9 @@
 			generateWithHash(sdbm(Math.random().toString()));
 		}
 	}
+
 	function generateWithHash(hash) {
+		hashValue = hash;
 		if (!container.getAttribute('title')) {
 			container.setAttribute('title', 'A visual hash representation of the string: ' + hash);
 		}
@@ -52,9 +58,29 @@
 
 	}
 
+	function refresh() {
+		clear();
+		generateWithHash(hashValue);
+	}
+
 	function setRGB(newRGB) {
 		rgb = newRGB;
-		if (!rgb) rgb = Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256);
+		if (!rgb) rgb = rgbStr(Math.random(), Math.random(), Math.random());
+		return rgb;
+	}
+
+	function setRGBFromHash() {
+		rgb = rgbStr(
+			new Number(hashValue & 0x0F) / 15,
+			new Number(hashValue >>> 4 & 0x0F) / 15,
+			new Number(hashValue >>> 8 & 0x0F) / 15
+		);
+		return rgb;
+	}
+
+	// pass 0.0 to 1.0
+	function rgbStr(r, g, b) {
+		return niceDecimal(r * 255) + ',' + niceDecimal(g * 255) + ',' + niceDecimal(b * 255);
 	}
 
 	function clear() {
