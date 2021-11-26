@@ -1,8 +1,21 @@
 <html>
-<head><title>Solacon</title></head>
+<head>
+<title>Solacon</title>
+<script>
+var svgObj;
+window.addEventListener('load', function(ev) {
+	svgObj = document.getElementById('svg-obj');
+});
+
+</script>
+</head>
 <body>
 
-<object data="solacon.svg" type="image/svg+xml" style="width: 500px; height: 500px;" id="svg-obj" data-value="Hello world.">
+<object type="image/svg+xml" style="width: 500px; height: 500px;" id="svg-obj"
+	data="solacon.svg"
+	data-value="Hello world."
+	data-xrgb="0, 30, 255"
+>
 </object>
 
 </body>

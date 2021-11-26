@@ -1,55 +1,88 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" >
-  <script onLoad="alert('ok')" type="text/javascript"><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" class="solacon-svg">
+  <script type="text/javascript"><![CDATA[
 
 	var debug = false;
-	var container = window.frameElement;
-	var value = container && container.dataset.value;
-	var svgEl = document.getElementsByTagName('svg')[0];
-	var ctr = [250, 250];
-
-	// give us functions on the containing dom element
-	container.create = function(v) { create(v); }
+	var container;
+	var svgEl;
+	var center, width, height;
+	var rgb = '50, 50, 50';
+	var value;
 
 	function init(ev) {
-		console.log('init called: %o', ev);
-		create(value);
-		generate();
+		container = window.frameElement;
+		svgEl = document.getElementsByTagName('svg')[0];
+		value = container.dataset.value;
+		if (container.dataset.rgb) rgb = container.dataset.rgb;
+		width = container.clientWidth;
+		height = container.clientHeight;
+		center = [width / 2, height / 2];
+		console.info('init called: value=[%s] rgb=(%s) w=%d h=%d center(%d,%d)', value, rgb, width, height, center[0], center[1]);
+		container.generate = function(v) {
+			clear();
+			generate(v);
+		}
+		container.setRGB = function(newRGB) { setRGB(newRGB); }
+		generate(value);
 	}
 
-	function generate() {
-		let slices = Math.floor(3 + Math.random() * 7);
+	function generate(val) {
+		if (val) {
+			generateWithHash(sdbm(val));
+		} else {
+			generateWithHash(sdbm(Math.random().toString()));
+		}
+	}
+	function generateWithHash(hash) {
+		if (!container.getAttribute('title')) {
+			container.setAttribute('title', 'A visual hash representation of the string: ' + hash);
+		}
+		let slices = (hash & 0x07) + 3;
+		console.info('generating on hash %o [%s], slices=%d', hash, hash.toString(2), slices);
 		let wAngle = Math.PI * 2 / slices;
-		let data = [
-			[Math.random(), Math.random(), Math.random()],
-			[Math.random(), Math.random(), Math.random()],
-			[Math.random(), Math.random(), Math.random()]
-		];
+		let data = []
+		for (let i = 0 ; i < 6 ; i++) {
+			data.push([
+				(hash >>> (i * 3) & 0x07) / 7,
+				(hash >>> (i * 3 + 1) & 0x07) / 7,
+				hash >>> (i * 3 + 2) & 0x07
+			]);
+			if (debug) console.debug('%d => %o', i, data[data.length-1]);
+		}
 		for (let i = 0 ; i < slices ; i++) {
-			wedge(wAngle * i, wAngle * (i + 1), 250, data);
+			wedge(wAngle * i, wAngle * (i + 1), Math.min(width, height) / 2, data);
 		}
 
 	}
 
-	// data = [r1, r2, alpha] where all values are 0.0-1.0
+	function setRGB(newRGB) {
+		rgb = newRGB;
+		if (!rgb) rgb = Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256);
+	}
+
+	function clear() {
+		svgEl.innerHTML = '';
+	}
+
+	// data = [r1, r2, alpha] where r1 and r2 are 0.0 to 1.0 and alpha is 0 to 7
 	function wedge(a1, a2, size, data) {
 		for (let i = 0 ; i < data.length ; i++) {
 			swish(a1, a2, size * data[i][0], size * data[i][1], data[i][2]);
 		}
 		let endPt = pt(a1, size);
-		if (debug) addSvgLine([0,0], endPt, ctr, 'gray');
+		if (debug) addSvgLine([0,0], endPt, center, 'gray');
 		endPt = pt(a2, size);
-		if (debug) addSvgLine([0,0], endPt, ctr, 'gray');
+		if (debug) addSvgLine([0,0], endPt, center, 'gray');
 	}
 
 	function swish(a1, a2, r1, r2, alpha) {
 		let p1 = pt(a1, r1);
 		let p2 = pt(a2, r2);
 		if (debug) {
-			addSvgPt(p1, ctr, 'red');
-			addSvgPt(p2, ctr, 'blue');
+			addSvgPt(p1, center, 'red');
+			addSvgPt(p2, center, 'blue');
 		}
 		let paths = [];
-		paths.push(bez(a1, a2, r1, r2, ctr));
+		paths.push(bez(a1, a2, r1, r2, center));
 		addSvgEl(alpha, paths);
 	}
 
@@ -68,8 +101,8 @@
 		let b1 = pt(a1 + bd, (r1 + r2) / 2);
 		let b2 = pt(a2 - bd, (r1 + r2) / 2);
 		if (debug) {
-			addSvgPt(b1, ctr, 'brown');
-			addSvgPt(b2, ctr, 'orange');
+			addSvgPt(b1, center, 'brown');
+			addSvgPt(b2, center, 'orange');
 		}
 		let path = ptStr(p1, offset, 'M') + ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p2, offset);
 		b1 = pt(a1 + bd, (r1 + r2) / 3);
@@ -84,18 +117,26 @@
 	}
 	function ptStr(pt, offset, cmd) {
 		if (!offset) offset = [0,0];
-		let x = Math.round((pt[0] + offset[0]) * 100) / 100;
-		let y = Math.round((pt[1] + offset[1]) * 100) / 100;
+		let x = niceDecimal(pt[0] + offset[0]);
+		let y = niceDecimal(pt[1] + offset[1]);
 		return (cmd ? cmd + ' ' : '') + x + ' ' + y;
 	}
 
-	
+
+	function niceDecimal(d) {
+		return Math.round(d * 1000) / 1000;
+	}
+
+	// alpha is 0-7 for class name
 	function addSvgEl(alpha, paths) {
         	let el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        	el.setAttribute('fill', 'rgba(0.5, 0.5, 0.5, ' + alpha + ')');
-        	el.setAttribute("d", paths.join(' '));
+        	el.setAttribute('fill', 'rgba(' + rgb +', ' + niceDecimal(alpha / 7) + ')');
+        	el.setAttribute('d', paths.join(' '));
+        	el.setAttribute('class', 'solacon-shade-' + alpha);
 		svgEl.appendChild(el);
 	}
+
+	// Pt and Line are really only for debugging
 	function addSvgPt(pt, offset, color) {
         	let el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         	el.setAttribute('fill', color);
@@ -117,6 +158,7 @@
 
 
 	function sdbm(s) {
+		if (s.length < 6) s = s + s + s + s + s;  //short strings kinda suck
         	var h = 0;
         	for (var i = 0 ; i < s.length ; i++) {
             		h = s.charCodeAt(i) + (h << 6) + (h << 16) - h;
