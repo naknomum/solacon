@@ -38,6 +38,7 @@
 
 	function generateWithHash(hash) {
 		hashValue = hash;
+		if (!rgb) setRGBFromHash();
 		if (!container.getAttribute('title')) {
 			container.setAttribute('title', 'A visual hash representation of the string: ' + hash);
 		}

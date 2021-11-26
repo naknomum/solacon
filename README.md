@@ -31,7 +31,7 @@ svgObj.setRGB('100, 150, 200');
 svgObj.generate('some new value');
 svgObj.setRGB();         // random color
 svgObj.generate();       // random seed value
-svgObj.setRGBFromHash(); // color is based off hashValue (default behavior when color not specified)
+svgObj.setRGBFromHash(); // color is based off hashValue (default behavior)
 svgObj.refresh();        // applies color change to current shape
 ```
 
