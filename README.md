@@ -5,7 +5,7 @@ This is also known as a "visual hash".
 
 The solacon is **seeded with a value** (string) which determines the shape, symmetry, and shades of the image.
 
-The [SVG file](solacon.svg) contains all the javascript to generate the content, so one only needs to set attributes on the object
+The SVG file contains all the javascript to generate the content, so one only needs to set attributes on the object
 that is embedding the svg.
 
 ## Usage
@@ -14,7 +14,7 @@ that is embedding the svg.
 <object type="image/svg+xml" style="width: 500px; height: 500px;" id="svg-obj"
 	data="solacon.svg"
 	data-value="Hello world."
-	data-xrgb="0, 30, 255"
+	data-rgb="0, 30, 255"
 ></object>
 
 
