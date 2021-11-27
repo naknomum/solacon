@@ -1,163 +1,166 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="solacon-svg">
-  <script type="text/javascript"><![CDATA[
+    <script type="text/javascript"><![CDATA[
 
-	var container;
-	var svgEl;
-	var center, width, height;
-	var rgb;
-	var value;
-	var hashValue;
+    //      https://github.com/naknomum/solacon
 
-	function init(ev) {
-		container = window.frameElement;
-		svgEl = document.getElementsByTagName('svg')[0];
-		value = container.dataset.value;
-		if (container.dataset.rgb) rgb = container.dataset.rgb;
-		width = container.clientWidth;
-		height = container.clientHeight;
-		center = [width / 2, height / 2];
-		console.info('init called: value=[%s] rgb=(%s) w=%d h=%d center(%d,%d)', value, rgb, width, height, center[0], center[1]);
-		container.generate = function(v) {
-			clear();
-			generate(v);
-		}
-		container.setRGB = function(newRGB) { return setRGB(newRGB); }
-		container.setRGBFromHash = function() { return setRGBFromHash(); }
-		container.getHashValue = function() { return hashValue; }
-		container.refresh = function() { return refresh(); }
-		generate(value);
-	}
+    var container;
+    var svgEl;
+    var center, width, height;
+    var rgb;
+    var value;
+    var hashValue;
 
-	function generate(val) {
-		if (val) {
-			generateWithHash(sdbm(val));
-		} else {
-			generateWithHash(sdbm(Math.random().toString()));
-		}
-	}
+    function init(ev) {
+        container = window.frameElement;
+        svgEl = document.getElementsByTagName('svg')[0];
+        value = container.dataset.value;
+        if (container.dataset.rgb) rgb = container.dataset.rgb;
+        width = container.clientWidth;
+        height = container.clientHeight;
+        center = [width / 2, height / 2];
+        console.info('init called: value=[%s] rgb=(%s) w=%d h=%d center(%d,%d)', value, rgb, width, height, center[0], center[1]);
+        container.generate = function(v) {
+            clear();
+            generate(v);
+        }
+        container.setRGB = function(newRGB) { return setRGB(newRGB); }
+        container.setRGBFromHash = function() { return setRGBFromHash(); }
+        container.getHashValue = function() { return hashValue; }
+        container.refresh = function() { return refresh(); }
+        generate(value);
+    }
 
-	function generateWithHash(hash) {
-		hashValue = hash;
-		if (!rgb) setRGBFromHash();
-		if (!container.getAttribute('title')) {
-			container.setAttribute('title', 'A visual hash representation of the string: ' + hash);
-		}
-		let slices = (hash & 0x07) + 3;
-		console.info('generating on hash %o [%s], slices=%d', hash, hash.toString(2), slices);
-		let wAngle = Math.PI * 2 / slices;
-		let data = []
-		for (let i = 0 ; i < 6 ; i++) {
-			data.push([
-				(hash >>> (i * 3) & 0x07) / 7,
-				(hash >>> (i * 3 + 1) & 0x07) / 7,
-				hash >>> (i * 3 + 2) & 0x07
-			]);
-		}
-		for (let i = 0 ; i < slices ; i++) {
-			wedge(wAngle * i, wAngle * (i + 1), Math.min(width, height) / 2, data);
-		}
+    function generate(val) {
+        if (val) {
+            generateWithHash(sdbm(val));
+        } else {
+            generateWithHash(sdbm(Math.random().toString()));
+        }
+    }
 
-	}
+    function generateWithHash(hash) {
+        hashValue = hash;
+        if (!rgb) setRGBFromHash();
+        if (!container.getAttribute('title')) {
+            container.setAttribute('title', 'A visual hash representation of the string: ' + hash);
+        }
+        let slices = (hash & 0x07) + 3;
+        console.info('generating on hash %o [%s], slices=%d', hash, hash.toString(2), slices);
+        let wAngle = Math.PI * 2 / slices;
+        let data = []
+        for (let i = 0 ; i < 6 ; i++) {
+            data.push([
+                (hash >>> (i * 3) & 0x07) / 7,
+                (hash >>> (i * 3 + 1) & 0x07) / 7,
+                hash >>> (i * 3 + 2) & 0x07
+            ]);
+        }
+        for (let i = 0 ; i < slices ; i++) {
+            wedge(wAngle * i, wAngle * (i + 1), Math.min(width, height) / 2, data);
+        }
 
-	function refresh() {
-		clear();
-		generateWithHash(hashValue);
-	}
+    }
 
-	function setRGB(newRGB) {
-		rgb = newRGB;
-		if (!rgb) rgb = rgbStr(Math.random(), Math.random(), Math.random());
-		return rgb;
-	}
+    function refresh() {
+        clear();
+        generateWithHash(hashValue);
+    }
 
-	function setRGBFromHash() {
-		rgb = rgbStr(
-			new Number(hashValue & 0x0F) / 15,
-			new Number(hashValue >>> 4 & 0x0F) / 15,
-			new Number(hashValue >>> 8 & 0x0F) / 15
-		);
-		return rgb;
-	}
+    function setRGB(newRGB) {
+        rgb = newRGB;
+        if (!rgb) rgb = rgbStr(Math.random(), Math.random(), Math.random());
+        return rgb;
+    }
 
-	// pass 0.0 to 1.0
-	function rgbStr(r, g, b) {
-		return niceDecimal(r * 255) + ',' + niceDecimal(g * 255) + ',' + niceDecimal(b * 255);
-	}
+    function setRGBFromHash() {
+        rgb = rgbStr(
+            new Number(hashValue & 0x0F) / 15,
+            new Number(hashValue >>> 4 & 0x0F) / 15,
+            new Number(hashValue >>> 8 & 0x0F) / 15
+        );
+        return rgb;
+    }
 
-	function clear() {
-		svgEl.innerHTML = '';
-	}
+    // pass 0.0 to 1.0
+    function rgbStr(r, g, b) {
+        return niceDecimal(r * 255) + ',' + niceDecimal(g * 255) + ',' + niceDecimal(b * 255);
+    }
 
-	// data = [r1, r2, alpha] where r1 and r2 are 0.0 to 1.0 and alpha is 0 to 7
-	function wedge(a1, a2, size, data) {
-		for (let i = 0 ; i < data.length ; i++) {
-			swish(a1, a2, size * data[i][0], size * data[i][1], data[i][2]);
-		}
-		let endPt = pt(a1, size);
-		endPt = pt(a2, size);
-	}
+    function clear() {
+        svgEl.innerHTML = '';
+    }
 
-	function swish(a1, a2, r1, r2, alpha) {
-		let p1 = pt(a1, r1);
-		let p2 = pt(a2, r2);
-		let paths = [];
-		paths.push(bez(a1, a2, r1, r2, center));
-		addSvgEl(alpha, paths);
-	}
+    // data = [r1, r2, alpha] where r1 and r2 are 0.0 to 1.0 and alpha is 0 to 7
+    function wedge(a1, a2, size, data) {
+        for (let i = 0 ; i < data.length ; i++) {
+            swish(a1, a2, size * data[i][0], size * data[i][1], data[i][2]);
+        }
+        let endPt = pt(a1, size);
+        endPt = pt(a2, size);
+    }
+
+    function swish(a1, a2, r1, r2, alpha) {
+        let p1 = pt(a1, r1);
+        let p2 = pt(a2, r2);
+        let paths = [];
+        paths.push(bez(a1, a2, r1, r2, center));
+        addSvgEl(alpha, paths);
+    }
 
 
-	// this requires/assumes a2 > a1
-	function bez(a1, a2, r1, r2, offset) {
-		let aNudge = 0.3;
-		let rNudge = 0.03;
-		let p1 = pt(a1, r1);
-		let p2 = pt(a2, r2);
-		let bd = (a2 - a1) / 3;
-		let b1 = pt(a1 + bd, (r1 + r2) / 2);
-		let b2 = pt(a2 - bd, (r1 + r2) / 2);
-		let path = ptStr(p1, offset, 'M') + ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p2, offset);
-		b1 = pt(a1 + bd, (r1 + r2) / 3);
-		b2 = pt(a2 - bd, (r1 + r2) / 3);
-		path += ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p1, offset);
-		return path;
-	}
+    // this requires/assumes a2 > a1
+    function bez(a1, a2, r1, r2, offset) {
+        let aNudge = 0.3;
+        let rNudge = 0.03;
+        let p1 = pt(a1, r1);
+        let p2 = pt(a2, r2);
+        let bd = (a2 - a1) / 3;
+        let b1 = pt(a1 + bd, (r1 + r2) / 2);
+        let b2 = pt(a2 - bd, (r1 + r2) / 2);
+        let path = ptStr(p1, offset, 'M') + ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p2, offset);
+        b1 = pt(a1 + bd, (r1 + r2) / 3);
+        b2 = pt(a2 - bd, (r1 + r2) / 3);
+        path += ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p1, offset);
+        return path;
+    }
 
-	function pt(theta, r) {
-		let x = r * Math.cos(theta);
-		let y = r * Math.sin(theta);
-		return [x,y];
-	}
+    function pt(theta, r) {
+        let x = r * Math.cos(theta);
+        let y = r * Math.sin(theta);
+        return [x,y];
+    }
 
-	function ptStr(pt, offset, cmd) {
-		if (!offset) offset = [0,0];
-		let x = niceDecimal(pt[0] + offset[0]);
-		let y = niceDecimal(pt[1] + offset[1]);
-		return (cmd ? cmd + ' ' : '') + x + ' ' + y;
-	}
+    function ptStr(pt, offset, cmd) {
+        if (!offset) offset = [0,0];
+        let x = niceDecimal(pt[0] + offset[0]);
+        let y = niceDecimal(pt[1] + offset[1]);
+        return (cmd ? cmd + ' ' : '') + x + ' ' + y;
+    }
 
-	function niceDecimal(d) {
-		return Math.round(d * 1000) / 1000;
-	}
+    function niceDecimal(d) {
+        return Math.round(d * 1000) / 1000;
+    }
 
-	// alpha is 0-7 for class name
-	function addSvgEl(alpha, paths) {
-        	let el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        	el.setAttribute('fill', 'rgba(' + rgb +', ' + niceDecimal(alpha / 7) + ')');
-        	el.setAttribute('d', paths.join(' '));
-        	el.setAttribute('class', 'solacon-shade-' + alpha);
-		svgEl.appendChild(el);
-	}
+    // alpha is 0-7 for class name
+    function addSvgEl(alpha, paths) {
+        let el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        el.setAttribute('fill', 'rgba(' + rgb +', ' + niceDecimal(alpha / 7) + ')');
+        el.setAttribute('d', paths.join(' '));
+        el.setAttribute('class', 'solacon-shade-' + alpha);
+        svgEl.appendChild(el);
+        return el;
+    }
 
-	function sdbm(s) {
-		if (s.length < 6) s = s + s + s + s + s;  //short strings kinda suck
-        	var h = 0;
-        	for (var i = 0 ; i < s.length ; i++) {
-            		h = s.charCodeAt(i) + (h << 6) + (h << 16) - h;
-        	}
-        	return (h >>> 0);
-	}
+    function sdbm(s) {
+        if (s.length < 6) s = s + s + s + s + s;  //short strings kinda suck
+        var h = 0;
+        for (var i = 0 ; i < s.length ; i++) {
+            h = s.charCodeAt(i) + (h << 6) + (h << 16) - h;
+        }
+        return (h >>> 0);
+    }
 
-	window.addEventListener('load', function(ev) { init(ev); });
+    window.addEventListener('load', function(ev) { init(ev); });
 
-  ]]></script>
+    ]]></script>
 </svg>
