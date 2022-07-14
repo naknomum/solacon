@@ -1,11 +1,11 @@
 # solacon
 
-A *solacon* is a varition of an [identicon](https://en.wikipedia.org/wiki/Identicon), in the form of a solar/spiral/floral shape.
+A *solacon* is a variation of an [identicon](https://en.wikipedia.org/wiki/Identicon), in the form of a solar/spiral/floral shape.
 This is also known as a "visual hash".
 
 The solacon is **seeded with a value** (string) which determines the shape, symmetry, and shades of the image.
 
-The SVG file contains all the javascript to generate the content, so one only needs to set attributes (e.g. `data-value`) on the object
+The SVG file contains all the javascript needed to generate the content, so one only needs to set attributes (e.g. `data-value`) on the object
 that is embedding the svg.
 
 ![Solacon.svg](Solacon.svg.png "Solacon.svg")
