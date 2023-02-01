@@ -30,9 +30,10 @@ The image generation can also be customised using GET variables in the URL. Here
 - `size=SIZE` where `SIZE` is the width and height in px. Example: `size=512`.
 - `download=TYPE` where `TYPE` is `png` or `svg`. The image download will start automatically without having to click on the download button.
 
-Example:
+Examples:
 
-	index.html/?string=Lorem%20Ipsum&color=326496&background=white&download=png
+- `index.html?string=hujMdpAtoaDztvZ&color=b079b4`
+- `index.html?string=Lorem%20Ipsum&color=326496&background=white&download=png`
 
 ## JavaScript
 
@@ -50,7 +51,7 @@ svgObj.refresh();        // applies color change to current shape
 
 ## Live demo
 
-Try out some [dynamical examples](https://naknomum.github.io/solacon-example/) of **solacons** in action.
+Try out some [dynamical examples](https://misaki-web.github.io/solacon/) of **solacons** in action.
 
 ## Similar projects
 
