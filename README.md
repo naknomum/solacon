@@ -49,6 +49,12 @@ svgObj.setRGBFromHash(); // color is based off hashValue (default behavior)
 svgObj.refresh();        // applies color change to current shape
 ```
 
+## Server script
+
+The file `server-script/solacon.sh` illustrates how to get solacon images on a server, without user interaction.
+
+Run `solacon.sh -h` for more details.
+
 ## Live demo
 
 Try out some [dynamical examples](https://misaki-web.github.io/solacon/) of **solacons** in action.

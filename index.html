@@ -145,22 +145,22 @@
 			string = getSVGSetting('string');
 			rgb = convertColor(getSVGSetting('color'), 'rgb');
 			size = parseInt(getSVGSetting('size'));
-			
+
 			if (size > 0) {
 				width = size;
 				height = size;
-				
+
 				var svgObjContainer = document.getElementById('svg-obj-container');
 				svgObjContainer.style.width = width + 'px';
 				svgObjContainer.style.height = height + 'px';
-				
+
 				svgObj.style.width = width + 'px';
 				svgObj.style.height = height + 'px';
 			} else {
 				width = svgObj.clientWidth;
 				height = svgObj.clientHeight;
 			}
-			
+
 			center = [width / 2, height / 2];
 
 			svgEl.setAttribute('width', width);
@@ -199,8 +199,6 @@
 
 			if (searchParams.has(settingName)) {
 				setting = searchParams.get(settingName);
-			} else if (settingName in svgObj.dataset) {
-				setting = svgObj.dataset[settingName];
 			}
 
 			return setting;
@@ -226,6 +224,12 @@
 
 			generateWithHash(sdbm(s));
 
+			var s_base64 = window.btoa(s);
+			var color_hex = convertColor(rgb, 'hex');
+
+			svgObj.dataset.stringbase64 = s_base64;
+			svgObj.dataset.color = color_hex;
+
 			document.getElementById('img-data-string').innerHTML = s;
 			document.getElementById('img-data-color').innerHTML = 'rgb(' + rgb + '); #' + convertColor(rgb, 'hex');
 			var bgColor = '';
@@ -250,8 +254,8 @@
 			var historyEntry = document.createElement('li');
 			var historyImg = document.createElement('img');
 			historyImg.src = 'data:image/svg+xml;base64,' + window.btoa(svgObj.contentDocument.documentElement.outerHTML);
-			historyImg.dataset.string = s;
-			historyImg.dataset.color = convertColor(rgb, 'hex');
+			historyImg.dataset.stringbase64 = s_base64;
+			historyImg.dataset.color = color_hex;
 			historyEntry.appendChild(historyImg);
 			document.getElementById('img-history').appendChild(historyEntry);
 
@@ -626,8 +630,8 @@
 		<h1 id="page-title">Solacon (identicon visual hash)</h1>
 
 		<div id="page-content">
-			<div id="svg-obj-container"><object id="svg-obj" type="image/svg+xml" data="solacon.svg" data-string=""
-					data-color="" data-background="" data-debug="" data-pngbase64=""></object></div>
+			<div id="svg-obj-container"><object id="svg-obj" type="image/svg+xml" data="solacon.svg"
+					data-stringbase64="" data-color="" data-pngbase64=""></object></div>
 
 			<ul id="img-data">
 				<li><span class="img-data-label">String:</span> <span id="img-data-string"></span></li>
