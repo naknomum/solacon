@@ -17,8 +17,12 @@ conf_chrome_path="chromium-browser"
 # Solacon distant base URL
 conf_solacon_distant_base_url="https://misaki-web.github.io/solacon/"
 
-# Solacon local base URL (if PHP is installed, a built-in web server will be started)
-conf_solacon_local_base_url="0.0.0.0:8000"
+# Solacon local base URL (if PHP is installed, a built-in web server
+# will be started locally; keep empty to disable the local server)
+conf_solacon_local_base_url="0.0.0.0:8018"
+
+# If a built-in server is started, number of server workers
+conf_nb_server_workers=1
 
 # If a built-in server is started, path to the file "index.html"
 conf_solacon_path_to_index_html="../index.html"
@@ -32,7 +36,7 @@ conf_add_string_to_image_name=true
 # Return the image content instead of saving it
 conf_return_image_content=false
 
-# Log file name (keep empty to disable log)
+# Log file name (must end with ".csv"; keep empty to disable log)
 conf_log_file_name="solacon-log.csv"
 
 ################################################################################
@@ -92,14 +96,17 @@ image_is_valid() {
 }
 
 implode() {
-	local separator=${1-}
-	local fields=${2-}
+	local separator=$1
+	local fields=("${@:2}")
+	
+	local imploded
 	
 	# ----------
 	
-	if shift 2; then
-		printf %s "$fields" "${@/#/$separator}"
-	fi
+	imploded=$(printf "$separator%s" "${fields[@]}")
+	imploded=${imploded:${#separator}}
+	
+	echo -n "$imploded"
 }
 
 url_encode() {
@@ -150,6 +157,14 @@ declare -r SCRIPT_DIR CONF_FILE
 if [[ -f $CONF_FILE ]]; then
 	# shellcheck source=./solacon.conf.sh
 	source "$CONF_FILE"
+fi
+
+if [[ ! $conf_nb_server_workers =~ ^[1-9][0-9]*$ ]]; then
+	conf_nb_server_workers=1
+fi
+
+if [[ ! $conf_log_file_name =~ ".csv"$ ]]; then
+	conf_log_file_name+=".csv"
 fi
 
 ################################################################################
@@ -249,22 +264,31 @@ elif [[ $solacon_format == "svg" ]]; then
 	grep_regex_img=' src="data:image/svg\+xml;base64,\K[^"]+'
 fi
 
+solacon_url=""
 solacon_img=$solacon_img_tpl
-php_web_server_pid=""
+php_web_server_parent_pid=""
+php_web_server_pid=()
 
-if wget --spider "http://$conf_solacon_local_base_url/" &> /dev/null; then
-	php_web_server_pid=$(pgrep -f "php -S $conf_solacon_local_base_url")
-	solacon_url="http://$conf_solacon_local_base_url/"
-elif type -p php > /dev/null; then
-	if [[ $conf_solacon_path_to_index_html == "../index.html" ]]; then
-		conf_solacon_path_to_index_html="$SCRIPT_DIR/$conf_solacon_path_to_index_html"
+if [[ -n $conf_solacon_local_base_url ]]; then
+	if wget --spider "http://$conf_solacon_local_base_url/" &> /dev/null; then
+		mapfile -t php_web_server_pid < <(pgrep -f "php -S $conf_solacon_local_base_url")
+		solacon_url="http://$conf_solacon_local_base_url/"
+	elif type -p php > /dev/null; then
+		if [[ $conf_solacon_path_to_index_html == "../index.html" ]]; then
+			conf_solacon_path_to_index_html="$SCRIPT_DIR/$conf_solacon_path_to_index_html"
+		fi
+		
+		cd "${conf_solacon_path_to_index_html%/*}" || cd_exit "${conf_solacon_path_to_index_html%/*}"
+		PHP_CLI_SERVER_WORKERS=$conf_nb_server_workers php -S "$conf_solacon_local_base_url" > /dev/null 2>&1 &
+		php_web_server_parent_pid=$!
+		
+		if [[ -n $php_web_server_parent_pid ]]; then
+			solacon_url="http://$conf_solacon_local_base_url/"
+		fi
 	fi
-	
-	cd "${conf_solacon_path_to_index_html%/*}" || cd_exit "${conf_solacon_path_to_index_html%/*}"
-	php -S "$conf_solacon_local_base_url" > /dev/null 2>&1 &
-	php_web_server_pid=$!
-	solacon_url="http://$conf_solacon_local_base_url/"
-else
+fi
+
+if [[ -z $solacon_url ]]; then
 	solacon_url=$conf_solacon_distant_base_url
 fi
 
@@ -342,12 +366,16 @@ until image_is_valid "$solacon_img"; do
 		solacon_img=${solacon_img_tpl//"%STRING%"/}
 	fi
 	
+	if [[ ${#php_web_server_pid[@]} == 0 && -n $php_web_server_parent_pid ]]; then
+		mapfile -t php_web_server_pid < <(pgrep -P "$php_web_server_parent_pid" | xargs echo "$php_web_server_parent_pid" | tr ' ' '\n')
+	fi
+	
 	debug "--------------------"
 	debug "Date:                $(date -d "@${current_date%%.*}" "+%Y-%m-%d %H:%M:%S")"
 	debug "Solacon URL:         $solacon_url"
 	
-	if [[ -n $php_web_server_pid ]]; then
-		debug "PHP web server PID:  $php_web_server_pid"
+	if ((${#php_web_server_pid[@]} > 0)); then
+		debug "PHP web server PID:  ${php_web_server_pid[*]}"
 	fi
 	
 	debug "--------------------"
@@ -396,6 +424,6 @@ if [[ $delete_image == true ]]; then
 	rm -f "$solacon_img"
 fi
 
-if [[ -n $php_web_server_pid && $conf_keep_web_server_running == false ]]; then
-	kill "$php_web_server_pid"
+if ((${#php_web_server_pid[@]} > 0)) && [[ $conf_keep_web_server_running == false ]]; then
+	kill "${php_web_server_pid[@]}"
 fi
