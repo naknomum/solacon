@@ -20,6 +20,9 @@ conf_solacon_distant_base_url="https://misaki-web.github.io/solacon/"
 # If access from outside is enabled, base URL
 conf_solacon_outside_base_url="0.0.0.0:850"
 
+# If access from outside is enabled, URL scheme
+conf_solacon_outside_url_scheme="http"
+
 # If access from outside is enabled, path to the file "index.php"
 conf_solacon_path_to_index_php="access-from-outside/index.php"
 
@@ -48,8 +51,8 @@ conf_return="save"
 # History file name (must end with ".csv"; keep empty to disable history)
 conf_history_file_name="solacon-history.csv"
 
-# Enable debug file
-conf_enable_debug_file=false
+# Log file name (must end with ".log"; keep empty to disable log)
+conf_log_file_name="solacon.log"
 
 ################################################################################
 # FUNCTIONS
@@ -115,10 +118,21 @@ debug() {
 			echo "$content" 1>&2
 		fi
 		
-		if [[ $ENABLE_DEBUG_FILE == true ]]; then
-			echo "$EPOCHSECONDS:$content" >> "$DEBUG_FILE"
+		if [[ -f $LOG_FILE ]]; then
+			echo "$EPOCHSECONDS:$content" >> "$LOG_FILE"
 		fi
 	fi
+}
+
+# First argument passed by reference.
+get_server_pid() {
+	local -n pid_array=$1
+	local base_url=$2
+	
+	# ----------
+	
+	# shellcheck disable=SC2034
+	mapfile -t pid_array < <(pgrep -f "php -S $base_url")
 }
 
 image_is_valid() {
@@ -167,8 +181,8 @@ manage_access_from_outside() {
 	if [[ $option == "enable" ]]; then
 		success=false
 		
-		if wget -T 5 -t 1 --spider "http://$base_url/" &> /dev/null; then
-			mapfile -t php_web_server_pid < <(pgrep -f "php -S $base_url")
+		if url_is_ok "$base_url"; then
+			get_server_pid "php_web_server_pid" "$base_url"
 			success=true
 		elif type -p php > /dev/null; then
 			cd "${path_to_index_php%/*}" || cd_exit "${path_to_index_php%/*}"
@@ -198,13 +212,13 @@ manage_access_from_outside() {
 				ip_address=$(LANG=c ifconfig "$interface" | grep -oP '^\s+inet \K[^ ]+')
 				
 				if [[ -n $ip_address ]]; then
-					demo_url="http://$ip_address:$port/?string=lorem-ipsum&download=png&color=124e9b&background=colored&size=512"
+					demo_url="$OUTSIDE_URL_SCHEME://$ip_address:$port/?string=lorem-ipsum&download=png&color=124e9b&background=colored&size=512"
 					
 					debug "Access from outside: $demo_url"
 				fi
 			fi
 			
-			mapfile -t php_web_server_pid < <(pgrep -f "php -S $base_url")
+			get_server_pid "php_web_server_pid" "$base_url"
 			
 			if ((${#php_web_server_pid[@]} > 0)); then
 				debug "PHP web server PID: ${php_web_server_pid[*]}"
@@ -213,8 +227,8 @@ manage_access_from_outside() {
 			debug "Can't enable access from outside."
 		fi
 	elif [[ $option == "disable" ]]; then
-		if wget -T 5 -t 1 --spider "http://$base_url/" &> /dev/null; then
-			mapfile -t php_web_server_pid < <(pgrep -f "php -S $base_url")
+		if url_is_ok "$base_url"; then
+			get_server_pid "php_web_server_pid" "$base_url"
 			
 			if ((${#php_web_server_pid[@]} > 0)); then
 				debug "PHP web server PID to be closed: ${php_web_server_pid[*]}"
@@ -245,6 +259,28 @@ url_encode() {
 	fi
 }
 
+url_is_ok() {
+	local url=$1
+	
+	local domain port
+	
+	# ----------
+	
+	domain=${url%%:*}
+	port=${port##*:}
+	
+	if [[ -z $port ]]; then
+		port=80
+	fi
+	
+	if [[ -n $domain ]]; then
+		#php -r "(\$socket = @fsockopen(\"$domain\", \"$port\", \$errno, \$errstr, 5)) === false ? exit(1) : exit(0);"
+		#nc -z -w 5 "$domain" "$port"
+		#timeout 5 bash -c "cat /dev/null > /dev/tcp/$domain/$port"
+		wget -T 5 -t 1 --spider "$domain:$port" &> /dev/null
+	fi
+}
+
 usage() {
 	echo ""
 	echo "Usage: $0 [-b BACKGROUND] [-c COLOR] [-d DIRECTORY] [-f FORMAT] [-h] [-k] [-o OUTSIDE] [-r RETURN] [-s SIZE] [-t TEXT]"
@@ -254,7 +290,7 @@ usage() {
 	echo "  -d: Directory where to save the images. If empty, the current script directory will be used."
 	echo "  -f: Image format: \"png\" or \"svg\". If empty, the format will be \"svg\"."
 	echo "  -h: Display help and exit."
-	echo "  -k: Kill the PHP built-in web server if it's running. It'll override configuration settings."
+	echo "  -k: Kill the PHP built-in web server if it's running, and exit. It'll override configuration settings."
 	echo "  -o: Toggle access from outside and exit. Options: \"enable\" or \"disable\"."
 	echo "  -r: Set the script return type (\"save\", \"content\", \"b64\" or \"name+b64\"). It'll override configuration settings."
 	echo "  -s: Image size (for PNG images). If empty, the size will be \"1024\"."
@@ -275,9 +311,8 @@ usage() {
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 CONF_FILE="$SCRIPT_DIR/solacon.conf.sh"
-DEBUG_FILE="$SCRIPT_DIR/solacon.log"
 
-declare -r SCRIPT_DIR CONF_FILE DEBUG_FILE
+declare -r SCRIPT_DIR CONF_FILE
 
 ################################################################################
 # SOURCE
@@ -296,6 +331,14 @@ if [[ ! $conf_outside_port =~ ^[1-9][0-9]*$ ]]; then
 	conf_outside_port="850"
 fi
 
+conf_log_file_name=${conf_log_file_name##*/}
+
+if [[ ! $conf_log_file_name =~ ".log"$ ]]; then
+	conf_log_file_name+=".log"
+fi
+
+conf_history_file_name=${conf_history_file_name##*/}
+
 if [[ ! $conf_history_file_name =~ ".csv"$ ]]; then
 	conf_history_file_name+=".csv"
 fi
@@ -304,17 +347,34 @@ if [[ $conf_return != "save" && $conf_return != "content" && $conf_return != "b6
 	conf_return="save"
 fi
 
-if [[ $conf_enable_debug_file != true && $conf_enable_debug_file != false ]]; then
-	conf_enable_debug_file=false
-fi
-
 ################################################################################
 # CONSTANTS, 2 of 2
 ################################################################################
 
-ENABLE_DEBUG_FILE=$conf_enable_debug_file
+OUTSIDE_URL_SCHEME=$conf_solacon_outside_url_scheme
 
-declare -r ENABLE_DEBUG_FILE
+declare -r OUTSIDE_URL_SCHEME
+
+HISTORY_FILE="$SCRIPT_DIR/$conf_history_file_name"
+LOG_FILE="$SCRIPT_DIR/$conf_log_file_name"
+
+declare -r HISTORY_FILE LOG_FILE
+
+if [[ ! -e $HISTORY_FILE ]]; then
+	touch "$HISTORY_FILE"
+fi
+
+if [[ -f $HISTORY_FILE ]]; then
+	chmod 666 "$HISTORY_FILE"
+fi
+
+if [[ ! -e $LOG_FILE ]]; then
+	touch "$LOG_FILE"
+fi
+
+if [[ -f $LOG_FILE ]]; then
+	chmod 666 "$LOG_FILE"
+fi
 
 ################################################################################
 # ARGUMENTS
@@ -348,7 +408,15 @@ while getopts ':b:c:d:f:hko:r:s:t:' opt; do
 			exit 0
 			;;
 		k)
-			conf_keep_web_server_running=false
+			if url_is_ok "$conf_solacon_local_base_url"; then
+				get_server_pid "php_web_server_pid" "$conf_solacon_local_base_url"
+				
+				if ((${#php_web_server_pid[@]} > 0)); then
+					kill "${php_web_server_pid[@]}"
+				fi
+			fi
+			
+			exit 0
 			;;
 		o)
 			manage_access_from_outside "$OPTARG" "$conf_solacon_path_to_index_php" "$conf_solacon_outside_base_url" "$conf_nb_server_workers"
@@ -427,8 +495,8 @@ php_parent_web_server_pid=""
 php_web_server_pid=()
 
 if [[ -n $conf_solacon_local_base_url ]]; then
-	if wget -T 5 -t 1 --spider "http://$conf_solacon_local_base_url/" &> /dev/null; then
-		mapfile -t php_web_server_pid < <(pgrep -f "php -S $conf_solacon_local_base_url")
+	if url_is_ok "$conf_solacon_local_base_url"; then
+		get_server_pid "php_web_server_pid" "$conf_solacon_local_base_url"
 		solacon_url="http://$conf_solacon_local_base_url/"
 	elif type -p php > /dev/null; then
 		if [[ $conf_solacon_path_to_index_html == "../index.html" ]]; then
@@ -563,7 +631,9 @@ until image_is_valid "$solacon_img"; do
 		debug "File:                $solacon_img"
 	fi
 	
-	grep -m 1 -oP "$grep_regex_img" <<< "$html" | base64 -d > "$solacon_img"
+	if [[ -n $string_base64_url ]]; then
+		grep -m 1 -oP "$grep_regex_img" <<< "$html" | base64 -d > "$solacon_img"
+	fi
 	
 	((i++))
 done
@@ -576,10 +646,9 @@ if image_is_valid "$solacon_img"; then
 			"$solacon_img"
 	fi
 	
-	if [[ -n $conf_history_file_name && ! $conf_history_file_name =~ "/"$ ]]; then
-		history_file="$SCRIPT_DIR/${conf_history_file_name##*/}"
+	if [[ -f $HISTORY_FILE ]]; then
 		image_hash=$(sha256sum "$solacon_img" | cut -d ' ' -f 1)
-		echo "$current_date,$string,$color,${solacon_img##*/},$image_hash" >> "$history_file"
+		echo "$current_date,$string,$color,${solacon_img##*/},$image_hash" >> "$HISTORY_FILE"
 	fi
 	
 	if [[ $conf_return == "content" || $conf_return == "b64" || $conf_return == "name+b64" ]]; then
