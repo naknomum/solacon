@@ -69,9 +69,9 @@ base64_url_encode() {
 	# ----------
 	
 	if [[ $is_base64 == true ]]; then
-		echo -n "$string" | tr '+/=' '-_*'
+		echo -n "$string" | tr '+/=' '*!~'
 	else
-		echo -n "$string" | base64 -w 0 | tr '+/=' '-_*'
+		echo -n "$string" | base64 -w 0 | tr '+/=' '*!~'
 	fi
 }
 
@@ -80,7 +80,7 @@ base64_url_decode() {
 	
 	# ----------
 	
-	echo -n "$string" | tr -- '-_*' '+/=' | base64 -d
+	echo -n "$string" | tr -- '*!~' '+/=' | base64 -d
 }
 
 # Thanks to <https://stackoverflow.com/a/59592881>.
