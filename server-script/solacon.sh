@@ -58,31 +58,6 @@ conf_log_file_name="solacon.log"
 # FUNCTIONS
 ################################################################################
 
-base64_url_encode() {
-	local string=$1
-	local is_base64=$2
-	
-	if [[ $is_base64 != true && $is_base64 != false ]]; then
-		is_base64=false
-	fi
-	
-	# ----------
-	
-	if [[ $is_base64 == true ]]; then
-		echo -n "$string" | tr '+/=' '*!~'
-	else
-		echo -n "$string" | base64 -w 0 | tr '+/=' '*!~'
-	fi
-}
-
-base64_url_decode() {
-	local string=$1
-	
-	# ----------
-	
-	echo -n "$string" | tr -- '*!~' '+/=' | base64 -d
-}
-
 # Thanks to <https://stackoverflow.com/a/59592881>.
 # catch STDO_VAR STDE_VAR COMMAND [ARGS]
 catch() {
@@ -101,6 +76,10 @@ cd_exit() {
 	debug "Can't enter the directory \"$path\"."
 	
 	exit 1
+}
+
+convert_to_base64url() {
+	tr '+/' '-_' | tr -d '='
 }
 
 debug() {
@@ -594,12 +573,12 @@ until image_is_valid "$solacon_img"; do
 	debug "$html_err" false
 	
 	string_base64=$(grep -m 1 -oP ' data-stringbase64="\K[^"]+' <<< "$html")
-	string_base64_url=$(base64_url_encode "$string_base64" true)
+	string_base64url=$(echo -n "$string_base64" | convert_to_base64url)
 	string=$(echo -n "$string_base64" | base64 -d)
 	color=$(grep -m 1 -oP ' data-color="\K[^"]+' <<< "$html")
 	
 	if [[ $conf_add_string_to_image_name == true ]]; then
-		solacon_img=${solacon_img_tpl//"%STRING%"/"-$string_base64_url"}
+		solacon_img=${solacon_img_tpl//"%STRING%"/"-$string_base64url"}
 	else
 		solacon_img=${solacon_img_tpl//"%STRING%"/}
 	fi
@@ -624,14 +603,14 @@ until image_is_valid "$solacon_img"; do
 	debug "--------------------"
 	debug "String:              $string"
 	debug "String (base64):     $string_base64"
-	debug "String (base64_url): $string_base64_url"
+	debug "String (base64url):  $string_base64url"
 	debug "--------------------"
 	
 	if [[ $conf_return == "save" ]]; then
 		debug "File:                $solacon_img"
 	fi
 	
-	if [[ -n $string_base64_url ]]; then
+	if [[ -n $string_base64url ]]; then
 		grep -m 1 -oP "$grep_regex_img" <<< "$html" | base64 -d > "$solacon_img"
 	fi
 	
