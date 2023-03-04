@@ -246,7 +246,7 @@ url_is_ok() {
 	# ----------
 	
 	domain=${url%%:*}
-	port=${port##*:}
+	port=${url##*:}
 	
 	if [[ -z $port ]]; then
 		port=80
