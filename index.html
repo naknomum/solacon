@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<title>Solacon | Identicon visual hash</title>
+
+	<link rel="icon" type="image/png" sizes="256x256"
+		href="data:image/png;base64,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" />
+
+	<style>
+		#page {
+			max-width: 700px;
+			margin: 20px auto;
+			padding: 0;
+			border: 1px solid #e4e4e4;
+			border-radius: 4px;
+			background-color: #f5f5f5;
+			box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+			font-size: 1em;
+		}
+
+		#page-title {
+			margin-top: 0;
+			padding: 10px;
+			background-color: rgb(50, 100, 150);
+			border-radius: 4px 4px 0 0;
+			color: #ffffff;
+			font-size: 1.75em;
+			text-align: center;
+		}
+
+		#page-content {
+			padding: 20px;
+		}
+
+		#svg-obj-container,
+		#svg-obj {
+			width: 384px;
+			height: 384px;
+		}
+
+		#svg-obj-container {
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		#img-data li {
+			margin-bottom: 5px;
+		}
+
+		.img-data-label {
+			font-weight: bold;
+		}
+
+		#img-settings-container {
+			border-radius: 4px;
+			background-color: #ffffff;
+		}
+
+		#img-settings-container legend {
+			font-weight: bold;
+		}
+
+		#img-settings {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		#img-settings-string-container {
+			display: flex;
+			gap: 5px;
+		}
+
+		#img-settings-string {
+			width: 100%;
+		}
+
+		#img-settings-buttons {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			align-items: center;
+			margin-top: 20px;
+			margin-bottom: 20px;
+		}
+
+		.img-settings-button {
+			font-weight: bold;
+			font-size: 1.1em;
+		}
+
+		#img-history {
+			display: flex;
+			flex-flow: row wrap;
+			gap: 10px;
+			margin-bottom: 0;
+			padding-left: 0;
+			list-style-type: none;
+		}
+
+		#img-history img {
+			width: 50px;
+			height: auto;
+			padding: 2px;
+			background-color: #ffffff;
+			border: 1px solid #e4e4e4;
+			border-radius: 4px;
+		}
+
+		#img-png-container {
+			position: absolute;
+			top: 0;
+			left: -2000px;
+		}
+	</style>
+
+	<script>
+		const threeDigitHexRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		const sixOrEightDigitHexRegex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i;
+		const rgbRegex = /^(rgba?\()?\s*([\d]{1,3})\s*,\s*([\d]{1,3})\s*,\s*([\d]{1,3})(\s*,\s*([\d]{1,3}))?\)?$/i;
+
+		var searchParams,
+			svgObj,
+			svgEl,
+			download,
+			debug,
+			string,
+			hashString,
+			rgb,
+			size,
+			width,
+			height,
+			center;
+
+		function init(ev) {
+			searchParams = new URLSearchParams(window.location.search)
+			svgObj = document.getElementById('svg-obj');
+			svgEl = svgObj.contentDocument.documentElement;
+			download = (getSVGSetting('download') === 'png' || getSVGSetting('download') === 'svg') ? getSVGSetting('download') : '';
+			debug = (getSVGSetting('debug') === 'true' || getSVGSetting('debug') === '1') ? true : false;
+			string = getSVGSetting('string');
+			rgb = convertColor(getSVGSetting('color'), 'rgb');
+			size = parseInt(getSVGSetting('size'));
+
+			if (size > 0) {
+				width = size;
+				height = size;
+
+				var svgObjContainer = document.getElementById('svg-obj-container');
+				svgObjContainer.style.width = width + 'px';
+				svgObjContainer.style.height = height + 'px';
+
+				svgObj.style.width = width + 'px';
+				svgObj.style.height = height + 'px';
+			} else {
+				width = svgObj.clientWidth;
+				height = svgObj.clientHeight;
+			}
+
+			center = [width / 2, height / 2];
+
+			svgEl.setAttribute('width', width);
+			svgEl.setAttribute('height', height);
+
+			if (debug) {
+				console.info('Solacon: init called: string=[%s] rgb=(%s) w=%d h=%d center(%d,%d)', string, rgb, width, height, center[0], center[1]);
+			}
+
+			svgObj.generate = function (s) {
+				clear();
+				generate(s);
+			}
+
+			svgObj.setRGB = function (newRGB) {
+				return setRGB(newRGB);
+			}
+
+			svgObj.setRGBFromHash = function () {
+				return setRGBFromHash();
+			}
+
+			svgObj.getHashString = function () {
+				return hashString;
+			}
+
+			svgObj.refresh = function () {
+				return refresh();
+			}
+
+			generate(string);
+		}
+
+		function getSVGSetting(settingName) {
+			var setting = '';
+
+			if (searchParams.has(settingName)) {
+				setting = searchParams.get(settingName);
+			}
+
+			return setting;
+		}
+
+		function generate(s = '') {
+			var stringInput = document.getElementById('img-settings-string');
+
+			if (stringInput && stringInput.value.length) {
+				s = stringInput.value;
+			}
+
+			if (!s.length) {
+				s = getRandomString(15);
+			}
+
+			if (
+				document.getElementById('img-settings-random-color').checked &&
+				(!searchParams.has('color') || !searchParams.get('color').length)
+			) {
+				rgb = '';
+			}
+
+			generateWithHash(sdbm(s));
+
+			var s_base64 = window.btoa(s);
+			var color_hex = convertColor(rgb, 'hex');
+
+			svgObj.dataset.stringbase64 = s_base64;
+			svgObj.dataset.color = color_hex;
+
+			document.getElementById('img-data-string').innerHTML = s;
+			document.getElementById('img-data-color').innerHTML = 'rgb(' + rgb + '); #' + convertColor(rgb, 'hex');
+			var bgColor = '';
+
+			if (getSVGSetting('background') == 'white' || document.getElementById('img-settings-bg-white').checked) {
+				bgColor = 'ffffff';
+			} else if (getSVGSetting('background') == 'colored' || document.getElementById('img-settings-bg-colored').checked) {
+				bgColor = getBackgroundColor(convertColor(rgb, 'hex'), 0.15);
+			}
+
+			if (bgColor.length) {
+				svgEl.style.backgroundColor = '#' + bgColor;
+			} else {
+				svgEl.style.backgroundColor = '';
+			}
+
+			const url = new URL(window.location);
+			url.searchParams.set('string', encodeURIComponent(s));
+			url.searchParams.set('color', encodeURIComponent(convertColor(rgb, 'hex')));
+			window.history.pushState({}, '', url);
+
+			var historyEntry = document.createElement('li');
+			var historyImg = document.createElement('img');
+			historyImg.src = 'data:image/svg+xml;base64,' + window.btoa(svgObj.contentDocument.documentElement.outerHTML);
+			historyImg.dataset.stringbase64 = s_base64;
+			historyImg.dataset.color = color_hex;
+			historyEntry.appendChild(historyImg);
+			document.getElementById('img-history').appendChild(historyEntry);
+
+			if (download == 'png') {
+				getPNG();
+			} else if (download == 'svg') {
+				getSVG();
+			}
+		}
+
+		function generateWithHash(hash) {
+			hashString = hash;
+
+			if (!rgb.length) {
+				rgb = getRandomRGB();
+			}
+
+			if (!svgObj.getAttribute('title')) {
+				svgObj.setAttribute('title', 'A visual hash representation of the string ' + string + ' (hash: ' + hash + ')');
+			}
+
+			let slices = (hash & 0x07) + 3;
+
+			if (debug) {
+				console.info('Solacon: generating on hash %o [%s], slices=%d', hash, hash.toString(2), slices);
+			}
+
+			let wAngle = Math.PI * 2 / slices;
+			let data = []
+
+			for (let i = 0; i < 6; i++) {
+				data.push([
+					(hash >>> (i * 3) & 0x07) / 7,
+					(hash >>> (i * 3 + 1) & 0x07) / 7,
+					hash >>> (i * 3 + 2) & 0x07
+				]);
+			}
+
+			for (let i = 0; i < slices; i++) {
+				wedge(wAngle * i, wAngle * (i + 1), Math.min(width, height) / 2, data);
+			}
+		}
+
+		function refresh() {
+			clear();
+			generateWithHash(hashString);
+		}
+
+		function setRGB(newRGB) {
+			rgb = newRGB;
+
+			if (!rgb.length) {
+				rgb = getRandomRGB();
+			}
+
+			return rgb;
+		}
+
+		function setRGBFromHash() {
+			rgb = rgbStr(
+				new Number(hashString & 0x0F) / 15,
+				new Number(hashString >>> 4 & 0x0F) / 15,
+				new Number(hashString >>> 8 & 0x0F) / 15
+			);
+
+			return rgb;
+		}
+
+		// pass 0.0 to 1.0
+		function rgbStr(r, g, b) {
+			return niceDecimal(r * 255) + ',' + niceDecimal(g * 255) + ',' + niceDecimal(b * 255);
+		}
+
+		function clear() {
+			svgEl.innerHTML = '';
+		}
+
+		// data = [r1, r2, alpha] where r1 and r2 are 0.0 to 1.0 and alpha is 0 to 7
+		function wedge(a1, a2, size, data) {
+			for (let i = 0; i < data.length; i++) {
+				swish(a1, a2, size * data[i][0], size * data[i][1], data[i][2]);
+			}
+
+			let endPt = pt(a1, size);
+			endPt = pt(a2, size);
+		}
+
+		function swish(a1, a2, r1, r2, alpha) {
+			let p1 = pt(a1, r1);
+			let p2 = pt(a2, r2);
+			let paths = [];
+			paths.push(bez(a1, a2, r1, r2, center));
+			addSvgEl(alpha, paths);
+		}
+
+		// this requires/assumes a2 > a1
+		function bez(a1, a2, r1, r2, offset) {
+			let aNudge = 0.3;
+			let rNudge = 0.03;
+			let p1 = pt(a1, r1);
+			let p2 = pt(a2, r2);
+			let bd = (a2 - a1) / 3;
+			let b1 = pt(a1 + bd, (r1 + r2) / 2);
+			let b2 = pt(a2 - bd, (r1 + r2) / 2);
+			let path = ptStr(p1, offset, 'M') + ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p2, offset);
+			b1 = pt(a1 + bd, (r1 + r2) / 3);
+			b2 = pt(a2 - bd, (r1 + r2) / 3);
+			path += ' C ' + ptStr(b1, offset) + ', ' + ptStr(b2, offset) + ', ' + ptStr(p1, offset);
+
+			return path;
+		}
+
+		function pt(theta, r) {
+			let x = r * Math.cos(theta);
+			let y = r * Math.sin(theta);
+
+			return [x, y];
+		}
+
+		function ptStr(pt, offset, cmd) {
+			if (!offset) {
+				offset = [0, 0];
+			}
+
+			let x = niceDecimal(pt[0] + offset[0]);
+			let y = niceDecimal(pt[1] + offset[1]);
+
+			return (cmd ? cmd + ' ' : '') + x + ' ' + y;
+		}
+
+		function niceDecimal(d) {
+			return Math.round(d * 1000) / 1000;
+		}
+
+		// alpha is 0-7 for class name
+		function addSvgEl(alpha, paths) {
+			let el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+			el.setAttribute('fill', 'rgba(' + rgb + ', ' + niceDecimal(alpha / 7) + ')');
+			el.setAttribute('d', paths.join(' '));
+			el.setAttribute('class', 'solacon-shade-' + alpha);
+			svgEl.appendChild(el);
+
+			return el;
+		}
+
+		function sdbm(s) {
+			// short strings kinda suck
+			if (s.length < 6) {
+				s = s + s + s + s + s;
+			}
+
+			var h = 0;
+
+			for (var i = 0; i < s.length; i++) {
+				h = s.charCodeAt(i) + (h << 6) + (h << 16) - h;
+			}
+
+			return (h >>> 0);
+		}
+
+		function getRandomString(length, inc_alpha_lower = true, inc_alpha_upper = true, inc_num = false, inc_special = false) {
+			var randomString = '';
+			var chars = '';
+
+			const chars_alpha_lower = 'abcdefghijklmnopqrstuvwxyz';
+			const chars_alpha_upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+			const chars_num = '0123456789';
+			const chars_special = '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~';
+
+			if (inc_special) {
+				chars += chars_special;
+			}
+
+			if (inc_num) {
+				chars += chars_num;
+			}
+
+			if (inc_alpha_upper) {
+				chars += chars_alpha_upper;
+			}
+
+			if (inc_alpha_lower || !chars.length) {
+				chars += chars_alpha_lower;
+			}
+
+			for (var i = 0; i < length; i++) {
+				randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+			}
+
+			return randomString;
+		}
+
+		function getRandomRGB() {
+			var rgb = '';
+			var min = Math.ceil(0);
+			var max = Math.floor(255);
+
+			for (let i = 0; i < 3; i++) {
+				if (rgb) {
+					rgb += ',';
+				}
+
+				rgb += Math.floor(Math.random() * (max - min + 1)) + min;
+			}
+
+			return rgb;
+		}
+
+		function getBackgroundColor(hexColor, opacity) {
+			var bgColor = '';
+
+			if (opacity < 0 || opacity > 1) {
+				opacity = 0.1;
+			}
+
+			if (hexColor.match(sixOrEightDigitHexRegex)) {
+				var hexComponents = sixOrEightDigitHexRegex.exec(hexColor);
+				var h1 = ('0x' + hexComponents[1]).toString(16);
+				var h2 = ('0x' + hexComponents[2]).toString(16);
+				var h3 = ('0x' + hexComponents[3]).toString(16);
+				var r = Math.floor(h1 * opacity + 0xff * (1 - opacity));
+				var g = Math.floor(h2 * opacity + 0xff * (1 - opacity));
+				var b = Math.floor(h3 * opacity + 0xff * (1 - opacity));
+				bgColor = (r << 16 | g << 8 | b).toString(16);
+			}
+
+			return bgColor;
+		}
+
+		// The function returns one of the following strings:
+		//   - empty string if no color was detected
+		//   - hex color with 6 lower case digits (ex.: "ffffff")
+		//   - rgb color with 3 numerical comma separated values (ex.: "255,255,255")
+		function formatColor(color) {
+			var formattedColor = '';
+			var regexResult;
+
+			if (color.match(threeDigitHexRegex)) {
+				formattedColor = color.replace(threeDigitHexRegex, function (m, r, g, b) {
+					return r + r + g + g + b + b;
+				});
+			} else if (color.match(sixOrEightDigitHexRegex)) {
+				regexResult = sixOrEightDigitHexRegex.exec(color);
+				formattedColor = regexResult[1] + regexResult[2] + regexResult[3];
+			} else if (color.match(rgbRegex)) {
+				regexResult = rgbRegex.exec(color);
+				formattedColor = regexResult[2] + ',' + regexResult[3] + ',' + regexResult[4];
+			}
+
+			formattedColor = formattedColor.toLowerCase();
+
+			return formattedColor;
+		}
+
+		// format: "hex" or "rgb"
+		function convertColor(color, format) {
+			var convertedColor = '';
+			var formattedColor = formatColor(color);
+			var regexResult;
+
+			if (
+				(formattedColor.match(sixOrEightDigitHexRegex) && format == 'hex') ||
+				(formattedColor.match(rgbRegex) && format == 'rgb')
+			) {
+				convertedColor = formattedColor;
+			} else if (formattedColor.match(rgbRegex) && format == 'hex') {
+				regexResult = rgbRegex.exec(formattedColor);
+
+				for (let i = 2; i < 5; i++) {
+					var hexPart = (+regexResult[i]).toString(16);
+					convertedColor += hexPart.length == 1 ? '0' + hexPart : hexPart;
+				}
+			} else if (formattedColor.match(sixOrEightDigitHexRegex) && format == 'rgb') {
+				regexResult = sixOrEightDigitHexRegex.exec(color);
+				convertedColor = parseInt(regexResult[1], 16) + ',' + parseInt(regexResult[2], 16) + ',' + parseInt(regexResult[3], 16);
+			}
+
+			return convertedColor;
+		}
+
+		function getPNG() {
+			function svgToPNG(svg, callback) {
+				const urlSVG = getSVGURL(svg);
+				svgURLToPNG(urlSVG, (imgData) => {
+					callback(imgData);
+					URL.revokeObjectURL(urlSVG);
+				});
+			}
+
+			function getSVGURL(svg) {
+				return URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+			}
+
+			function svgURLToPNG(svgURL, callback) {
+				const imgContainer = document.getElementById('img-png-container');
+
+				if (imgContainer.querySelector('img') && imgContainer.querySelector('img').src) {
+					imgContainer.querySelector('img').remove();
+				}
+
+				const newImg = document.createElement('img');
+				imgContainer.appendChild(newImg);
+				newImg.onload = function () {
+					const canvas = document.createElement('canvas');
+					canvas.width = newImg.clientWidth;
+					canvas.height = newImg.clientHeight;
+					const canvasContext = canvas.getContext('2d');
+					canvasContext.drawImage(newImg, 0, 0);
+					const imgData = canvas.toDataURL('image/png');
+					callback(imgData);
+					downloadPNG(imgData);
+				};
+
+				newImg.src = svgURL;
+			}
+
+			function downloadPNG(imgData) {
+				svgObj.dataset.pngbase64 = imgData;
+				var historyImg = document.querySelector('#img-history > li:last-child img');
+
+				if (historyImg) {
+					historyImg.dataset.pngbase64 = imgData;
+				}
+
+				downloadLink(imgData, 'solacon.png');
+			}
+
+			svgToPNG(svgEl.outerHTML.toString(), (imgData) => { });
+		}
+
+		function getSVG() {
+			const imgBlob = new Blob([svgEl.outerHTML.toString()]);
+			downloadLink(window.URL.createObjectURL(imgBlob), 'solacon.svg');
+		}
+
+		function downloadLink(hrefAttr, downloadAttr) {
+			var downloadLink = document.createElement('a');
+			downloadLink.href = hrefAttr;
+			downloadLink.download = downloadAttr;
+			downloadLink.click();
+			downloadLink.remove();
+		}
+
+		window.addEventListener('load', function (e) {
+			init(e);
+
+			const buttonDownloadSVG = document.getElementById('img-settings-button-download-svg');
+			buttonDownloadSVG.addEventListener('click', event => {
+				event.preventDefault();
+				getSVG();
+			});
+
+			const buttonDownloadPNG = document.getElementById('img-settings-button-download-png');
+			buttonDownloadPNG.addEventListener('click', event => {
+				event.preventDefault();
+				getPNG();
+			});
+
+			const buttonGenerate = document.getElementById('img-settings-button-generate');
+			buttonGenerate.addEventListener('click', event => {
+				event.preventDefault();
+				var svgObj = document.getElementById('svg-obj');
+				svgObj.generate();
+			});
+		});
+	</script>
+
+</head>
+
+<body>
+	<div id="page">
+		<h1 id="page-title">Solacon (identicon visual hash)</h1>
+
+		<div id="page-content">
+			<div id="svg-obj-container"><object id="svg-obj" type="image/svg+xml" data="solacon.svg"
+					data-stringbase64="" data-color="" data-pngbase64=""></object></div>
+
+			<ul id="img-data">
+				<li><span class="img-data-label">String:</span> <span id="img-data-string"></span></li>
+				<li><span class="img-data-label">Color:</span> <span id="img-data-color"></span></li>
+			</ul>
+
+			<fieldset id="img-settings-container">
+				<legend>Settings</legend>
+				<div id="img-settings">
+					<div>
+						<input id="img-settings-random-color" type="checkbox" checked="checked" />
+						<label for="img-settings-random-color">Random color</label>
+					</div>
+
+					<div>
+						<div>
+							<input id="img-settings-bg-none" type="radio" name="img-settings-bg" value="none"
+								checked="checked" />
+							<label for="img-settings-bg-none">No background</label>
+						</div>
+
+						<div>
+							<input id="img-settings-bg-white" type="radio" name="img-settings-bg" value="white" />
+							<label for="img-settings-bg-white">Add a white background</label>
+						</div>
+
+						<div>
+							<input id="img-settings-bg-colored" type="radio" name="img-settings-bg" value="colored" />
+							<label for="img-settings-bg-colored">Add a colored background</label>
+						</div>
+					</div>
+
+					<div id="img-settings-string-container">
+						<label for="img-settings-string">String:</label>
+						<input id="img-settings-string" type="text"
+							placeholder="Leave empty to generate a random string" />
+					</div>
+				</div>
+			</fieldset>
+
+			<div id="img-settings-buttons">
+				<div>
+					<button id="img-settings-button-download-svg" class="img-settings-button" type="button">Download
+						SVG</button>
+					<button id="img-settings-button-download-png" class="img-settings-button" type="button">Download
+						PNG</button>
+				</div>
+				<button id="img-settings-button-generate" class="img-settings-button" type="button">Generate a new
+					image</button>
+			</div>
+
+			<h2>History</h2>
+
+			<ul id="img-history">
+			</ul>
+
+			<div id="img-png-container"><img src="" alt="" /></div>
+		</div>
+	</div>
+</body>
+
+</html>

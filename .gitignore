@@ -1,0 +1,6 @@
+server-script/*.csv
+server-script/*.log
+server-script/*.png
+server-script/*.svg
+server-script/index.conf.php
+server-script/solacon.conf.sh
