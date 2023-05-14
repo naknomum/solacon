@@ -35,9 +35,9 @@ svgObj.setRGBFromHash(); // color is based off hashValue (default behavior)
 svgObj.refresh();        // applies color change to current shape
 ```
 
-## Similar projects
+## Related
 
-Another identicon project of mine, [Hexicon.js](https://github.com/naknomum/hexicon).
-
-For related work, check out [Awesome Identicons](https://github.com/drhus/awesome-identicons), a curated list of _visual hashes_ maintained by **Husam ABBOUD**.
+- [Kotlin Android port](https://github.com/phazei/solacon-kotlin) of solacon by phazei
+- Another identicon project of mine, [Hexicon.js](https://github.com/naknomum/hexicon).
+- For related work, check out [Awesome Identicons](https://github.com/drhus/awesome-identicons), a curated list of _visual hashes_ maintained by **Husam ABBOUD**.
 
